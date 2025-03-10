@@ -9,8 +9,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "conformance/conformance.pb.h"
-#include "v2/binary_wireformat.h"
-#include "v2/naming.h"
+#include "conformance/v2/binary_wireformat.h"
+#include "conformance/v2/naming.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/endian.h"
 

@@ -1,4 +1,4 @@
-#include "v2/binary_wireformat.h"
+#include "conformance/v2/binary_wireformat.h"
 
 #include <cstdint>
 #include <cstring>

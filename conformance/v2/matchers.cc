@@ -12,11 +12,12 @@
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
-#include "v2/global_test_environment.h"
-#include "v2/test_environment.h"
-#include "v2/testee.h"
+#include "conformance/v2/global_test_environment.h"
+#include "conformance/v2/test_environment.h"
+#include "conformance/v2/testee.h"
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/message.h"
+#include "google/protobuf/text_format.h"
 
 namespace google {
 namespace protobuf {

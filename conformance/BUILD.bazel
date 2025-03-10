@@ -25,6 +25,10 @@ load("//bazel:proto_library.bzl", "proto_library")
 load("//build_defs:internal_shell.bzl", "inline_sh_binary")
 load("//ruby:defs.bzl", "internal_ruby_proto_library")
 
+package(
+    default_visibility = ["//conformance:__subpackages__"],
+)
+
 exports_files([
     "bazel_conformance_test_runner.sh",
     "failure_list_cpp.txt",
@@ -69,6 +73,7 @@ proto_library(
 cc_proto_library(
     name = "conformance_cc_proto",
     deps = [":conformance_proto"],
+    visibility = ["//conformance:__subpackages__"],
 )
 
 internal_csharp_proto_library(
@@ -257,7 +262,10 @@ cc_binary(
     name = "conformance_cpp",
     testonly = 1,
     srcs = ["conformance_cpp.cc"],
-    visibility = ["//src:__subpackages__"],
+    visibility = [
+        "//src:__subpackages__",
+        "//conformance:__subpackages__",
+    ],
     deps = [
         ":conformance_cc_proto",
         "//:protobuf",
@@ -288,6 +296,7 @@ java_binary(
     main_class = "ConformanceJava",
     visibility = [
         "//java:__subpackages__",
+        "//conformance:__subpackages__",
     ],
     deps = [
         ":conformance_java_proto",
@@ -308,6 +317,7 @@ java_binary(
     main_class = "ConformanceJavaLite",
     visibility = [
         "//java:__subpackages__",
+        "//conformance:__subpackages__",
     ],
     deps = [
         ":conformance_java_proto_lite",

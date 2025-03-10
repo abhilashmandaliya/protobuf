@@ -1,6 +1,6 @@
 """TODO: mkruskal - Write module docstring."""
 
-load("//devtools/build_cleaner/skylark:build_defs.bzl", "register_extension_info")
+# load("//devtools/build_cleaner/skylark:build_defs.bzl", "register_extension_info")
 
 # TODO: figure out a way to keep this in sync with the suites defined in BUILD.
 _CONFORMANCE_SUITES = ["binary", "text"]
@@ -18,10 +18,10 @@ def conformance_suite(name, srcs, deps = []):
         tags = ["manual"],
     )
 
-register_extension_info(
-    extension = conformance_suite,
-    label_regex_for_dep = "{extension_name}_lib",
-)
+#register_extension_info(
+#    extension = conformance_suite,
+#    label_regex_for_dep = "{extension_name}_lib",
+#)
 
 def failure_lists(name):
     # This machinery is necessary to allow for non-existent failure lists.  If we add a new suite,

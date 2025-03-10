@@ -11,7 +11,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "conformance/conformance.pb.h"
-#include "v2/testee.h"
+#include "conformance/v2/testee.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
 

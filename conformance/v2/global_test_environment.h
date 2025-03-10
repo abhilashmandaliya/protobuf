@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 #include "absl/container/flat_hash_map.h"
 #include "absl/strings/string_view.h"
-#include "v2/test_environment.h"
-#include "v2/testee.h"
+#include "conformance/v2/test_environment.h"
+#include "conformance/v2/testee.h"
 
 namespace google {
 namespace protobuf {

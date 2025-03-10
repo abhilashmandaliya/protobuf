@@ -8,7 +8,7 @@
 #include "absl/strings/string_view.h"
 #include "conformance/conformance.pb.h"
 #include "conformance_test.h"
-#include "v2/binary_wireformat.h"
+#include "conformance/v2/binary_wireformat.h"
 #include "google/protobuf/descriptor.h"
 
 namespace google {

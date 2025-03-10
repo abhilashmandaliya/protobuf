@@ -5,13 +5,14 @@
 #include <gtest/gtest.h>
 #include "absl/container/flat_hash_map.h"
 #include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/log/absl_check.h"
 #include "absl/log/absl_log.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
-#include "v2/global_test_environment.h"
-#include "v2/test_environment.h"
-#include "v2/testee.h"
+#include "conformance/v2/global_test_environment.h"
+#include "conformance/v2/test_environment.h"
+#include "conformance/v2/testee.h"
 
 ABSL_FLAG(std::string, expected_failures_list, "",
           "File containing the tests that are expected to fail.");
@@ -81,7 +82,7 @@ void GlobalEnvironment::TearDown() {
     env_.SaveFailureList(
         absl::StrCat(dir, "/", absl::GetFlag(FLAGS_expected_failures_list)));
   }
-  ASSERT_OK(env_.Finalize());
+  ASSERT_TRUE(env_.Finalize().ok());
 }
 }  // namespace
 
@@ -143,6 +144,8 @@ internal::Test RecommendedTest(absl::string_view test_name) {
 }  // namespace google
 
 int main(int argc, char* argv[]) {
+  absl::ParseCommandLine(argc, argv);
+
   testing::InitGoogleTest(&argc, argv);
   testing::AddGlobalTestEnvironment(google::protobuf::GlobalEnvironment::Get());
 
