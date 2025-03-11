@@ -18,10 +18,13 @@
 #include "upb/port/def.inc"
 
 typedef struct {
-  upb_table t;              // For entries that don't fit in the array part.
-  const upb_value* array;   // Array part of the table. See const note above.
-  size_t array_size;        // Array part size.
-  size_t array_count;       // Array part number of elements.
+  upb_table t;                // For entries that don't fit in the array part.
+  const upb_value* array;     // Array part of the table. See const note above.
+  size_t array_size;          // Array part size.
+  size_t array_count;         // Array part number of elements.
+  uint64_t presence;          // Bit field to track presence in the array part.
+  const bool* presence_mask;  // Presence array to track presence in the array
+                              // part.
 } upb_inttable;
 
 #ifdef __cplusplus
@@ -84,8 +87,16 @@ bool upb_inttable_done(const upb_inttable* t, intptr_t i);
 uintptr_t upb_inttable_iter_key(const upb_inttable* t, intptr_t iter);
 upb_value upb_inttable_iter_value(const upb_inttable* t, intptr_t iter);
 
-UPB_INLINE bool upb_inttable_is_sentinel(upb_value v) {
-  return v.val == UINT64_MAX;
+UPB_INLINE bool upb_inttable_is_sentinel(const upb_inttable* t, uintptr_t key,
+                                         upb_value v) {
+  if (v.val != UINT64_MAX) {
+    return false;
+  }
+  if (UPB_LIKELY(t->array_size <= 64)) {
+    return (t->presence & ((uint64_t)1 << key)) == 0;
+  } else {
+    return !t->presence_mask[key];
+  }
 }
 
 #ifdef __cplusplus
