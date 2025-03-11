@@ -22,7 +22,7 @@ TEST_F(TextTest, ValidNonMessage) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                Wire(VarintField(1, 99)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
 }
 
 }  // namespace

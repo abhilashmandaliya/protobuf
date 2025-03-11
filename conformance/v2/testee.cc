@@ -131,7 +131,7 @@ TestResult InMemoryMessage::SerializeBinary() && {
   conformance::ConformanceResponse response =
       test_->testee().Run(full_name, request_);
 
-  return TestResult(test_->name(), type_, response);
+  return TestResult(test_->name(), type_, std::move(request_), std::move(response));
 }
 
 TestResult InMemoryMessage::SerializeText(TextFormatOptions options) && {
@@ -146,7 +146,7 @@ TestResult InMemoryMessage::SerializeText(TextFormatOptions options) && {
   conformance::ConformanceResponse response =
       test_->testee().Run(full_name, request_);
 
-  return TestResult(test_->name(), type_, response);
+  return TestResult(test_->name(), type_, std::move(request_), std::move(response));
 }
 
 TestResult InMemoryMessage::SerializeJson() && {
@@ -158,7 +158,7 @@ TestResult InMemoryMessage::SerializeJson() && {
   conformance::ConformanceResponse response =
       test_->testee().Run(full_name, request_);
 
-  return TestResult(test_->name(), type_, response);
+  return TestResult(test_->name(), type_, std::move(request_), std::move(response));
 }
 
 }  // namespace internal

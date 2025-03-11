@@ -38,7 +38,7 @@ TEST_F(DelimitedFieldTest, ValidNonMessage) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                Wire(VarintField(1, 99)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
 }
 
 TEST_F(DelimitedFieldTest, ValidNonMessage2) {
@@ -46,7 +46,7 @@ TEST_F(DelimitedFieldTest, ValidNonMessage2) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                LengthPrefixedField(18, VarintField(1, 88)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 98)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 98)pb")));
 }
 
 TEST_F(DelimitedFieldTest, ValidNonMessage3) {
@@ -54,7 +54,7 @@ TEST_F(DelimitedFieldTest, ValidNonMessage3) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                LengthPrefixedField(18, VarintField(1, 87)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
 }
 
 TEST_F(DelimitedFieldTest, ValidNonMessage4) {
@@ -62,7 +62,7 @@ TEST_F(DelimitedFieldTest, ValidNonMessage4) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                LengthPrefixedField(18, VarintField(1, 666)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 99)pb")));
 }
 
 TEST_F(DelimitedFieldTest, ValidLengthPrefixedField) {
@@ -70,7 +70,7 @@ TEST_F(DelimitedFieldTest, ValidLengthPrefixedField) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                LengthPrefixedField(18, VarintField(1, 99)))
                   .SerializeBinary(),
-              ParsedBinaryPayload(
+              ParsedPayload(
                   EqualsProto(R"pb(optional_nested_message { a: 99 })pb")));
 }
 
@@ -81,7 +81,7 @@ TEST_F(BinaryTest, Failing) {
                   .ParseBinary(TestAllTypesEdition2023::descriptor(),
                                VarintField(1, 99))
                   .SerializeBinary(),
-              ParsedBinaryPayload(EqualsProto(R"pb(optional_int32: 98)pb")));
+              ParsedPayload(EqualsProto(R"pb(optional_int32: 98)pb")));
 }
 
 class LengthDelimitedFieldTest

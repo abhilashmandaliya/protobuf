@@ -77,7 +77,7 @@ void GlobalEnvironment::TearDown() {
   }
   if (absl::GetFlag(FLAGS_fix)) {
     const char* dir = std::getenv("BUILD_WORKSPACE_DIRECTORY");
-    // TODO: Add Bazel and non-Blazel support for finding the target file.
+    // TODO: Non-Blazel support for finding the target file.
     ABSL_CHECK(dir != nullptr);
     env_.SaveFailureList(
         absl::StrCat(dir, "/", absl::GetFlag(FLAGS_expected_failures_list)));

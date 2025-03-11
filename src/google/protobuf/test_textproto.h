@@ -25,15 +25,15 @@
 namespace google {
 namespace protobuf {
 
-MATCHER_P(EqualsProto, expected, "") {
+MATCHER_P(EqualsProto, textproto, "") {
   const Message* msg = nullptr;
   std::unique_ptr<Message> msg_owned;
-  if constexpr (std::is_base_of_v<Message, decltype(expected)>) {
-    msg = &expected;
+  if constexpr (std::is_base_of_v<Message, decltype(textproto)>) {
+    msg = &textproto;
   } else {
     msg_owned = absl::WrapUnique(arg.New());
     msg = msg_owned.get();
-    if (!TextFormat::ParseFromString(expected, msg_owned.get())) {
+    if (!TextFormat::ParseFromString(textproto, msg_owned.get())) {
       *result_listener << "failed to parse textproto";
       return false;
     }

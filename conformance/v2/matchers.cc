@@ -127,6 +127,19 @@ void PrintTo(const internal::TestResult& result, std::ostream* os) {
   }
 }
 
+conformance::ConformanceResponse::ResultCase ExpectedResultCase(conformance::WireFormat format) {
+  switch(format) {
+    case conformance::PROTOBUF:
+      return conformance::ConformanceResponse::kProtobufPayload;
+    case conformance::TEXT_FORMAT:
+      return conformance::ConformanceResponse::kTextPayload;
+    case conformance::JSON:
+      return conformance::ConformanceResponse::kJsonPayload;
+    default:
+        ABSL_CHECK(false) << "Unsupported output format " << conformance::WireFormat_Name(format);
+  }
+}
+
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google

@@ -32,28 +32,29 @@ bool ReportSkip(absl::string_view test_name,
 
 void PrintTo(const TestResult& result, std::ostream* os);
 
+conformance::ConformanceResponse::ResultCase ExpectedResultCase(conformance::WireFormat);
+
 template <typename M, typename P>
 class PayloadMatcher {
  public:
   using is_gtest_matcher = void;
 
   explicit PayloadMatcher(absl::string_view name,
-                          conformance::ConformanceResponse::ResultCase result,
                           M matcher)
-      : name_(name), result_(result), matcher_(std::move(matcher)) {}
+      : name_(name), matcher_(std::move(matcher)) {}
   virtual ~PayloadMatcher() = default;
 
   bool MatchAndExplain(const TestResult& arg,
-                       ::testing::MatchResultListener* result_listener) const {
-    if (arg.response().result_case() != result_) {
-      if (arg.response().has_skipped()) {
-        return internal::ReportSkip(arg.name(), result_listener);
-      }
-      return internal::ReportFailure(
-          arg.name(), absl::StrCat(name_, " is missing"), result_listener);
+                       testing::MatchResultListener* result_listener) const {
+    if (arg.response().has_skipped()) {
+      return internal::ReportSkip(arg.name(), result_listener);
+    }
+    if (arg.response().result_case() != ExpectedResultCase(arg.request().requested_output_format())) {
+      return internal::ReportFailure(arg.name(), "payload is missing", result_listener);
     }
 
     auto payload = ExtractPayload(arg);
+    // TODO: move this into extract to give a better error message.  Need a generic way to pass payload to matcher_ though..
     if (payload == nullptr) {
       return internal::ReportFailure(arg.name(),
                                      absl::StrCat("failed to extract ", name_),
@@ -87,54 +88,54 @@ class PayloadMatcher {
 };
 
 template <typename M>
-class ParsedBinaryPayloadMatcher : public PayloadMatcher<M, Message> {
+class ParsedPayloadMatcher : public PayloadMatcher<M, Message> {
  public:
-  explicit ParsedBinaryPayloadMatcher(M matcher)
+  explicit ParsedPayloadMatcher(M matcher)
       : PayloadMatcher<M, Message>(
-            "parsed binary payload",
-            conformance::ConformanceResponse::kProtobufPayload,
+            "parsed payload",
             std::move(matcher)) {}
-  virtual ~ParsedBinaryPayloadMatcher() = default;
+  virtual ~ParsedPayloadMatcher() = default;
 
  private:
   std::unique_ptr<Message> ExtractPayload(
       const TestResult& arg) const override {
-    return internal::ParseBinary(arg);
+    switch (arg.request().requested_output_format()) {
+      case conformance::PROTOBUF:
+        return ParseBinary(arg);
+      case conformance::TEXT_FORMAT:
+        return ParseText(arg);
+      default:
+        ABSL_CHECK(false) << "Unsupported output format " << conformance::WireFormat_Name(arg.request().requested_output_format());
+    }
+
+    return nullptr;
   }
 };
 
 template <typename M>
-class ParsedTextPayloadMatcher : public PayloadMatcher<M, Message> {
+class RawPayloadMatcher : public PayloadMatcher<M, absl::string_view> {
  public:
-  explicit ParsedTextPayloadMatcher(M matcher)
-      : PayloadMatcher<M, Message>(
-            "parsed text payload",
-            conformance::ConformanceResponse::kProtobufPayload,
-            std::move(matcher)) {}
-  virtual ~ParsedTextPayloadMatcher() = default;
-
- private:
-  std::unique_ptr<Message> ExtractPayload(
-      const TestResult& arg) const override {
-    return internal::ParseText(arg);
-  }
-};
-
-template <typename M>
-class BinaryPayloadMatcher : public PayloadMatcher<M, absl::string_view> {
- public:
-  explicit BinaryPayloadMatcher(M matcher)
+  explicit RawPayloadMatcher(M matcher)
       : PayloadMatcher<M, absl::string_view>(
-            "binary payload",
-            conformance::ConformanceResponse::kProtobufPayload,
+            "payload",
             std::move(matcher)) {}
-  virtual ~BinaryPayloadMatcher() = default;
+  virtual ~RawPayloadMatcher() = default;
 
  private:
   std::unique_ptr<absl::string_view> ExtractPayload(
       const TestResult& arg) const override {
-    return std::make_unique<absl::string_view>(
-        arg.response().protobuf_payload());
+    switch (arg.request().requested_output_format()) {
+      case conformance::PROTOBUF:
+        return std::make_unique<absl::string_view>(arg.response().protobuf_payload());
+      case conformance::TEXT_FORMAT:
+        return std::make_unique<absl::string_view>(arg.response().text_payload());
+      case conformance::JSON:
+        return std::make_unique<absl::string_view>(arg.response().json_payload());
+      default:
+        ABSL_CHECK(false) << "Unknown output format " << conformance::WireFormat_Name(arg.request().requested_output_format());
+    }
+
+    return nullptr;
   }
 };
 
@@ -174,18 +175,13 @@ class FailureMatcher {
 }  // namespace internal
 
 template <typename M>
-internal::ParsedBinaryPayloadMatcher<M> ParsedBinaryPayload(M matcher) {
-  return internal::ParsedBinaryPayloadMatcher<M>(std::move(matcher));
+internal::ParsedPayloadMatcher<M> ParsedPayload(M matcher) {
+  return internal::ParsedPayloadMatcher<M>(std::move(matcher));
 }
 
 template <typename M>
-internal::ParsedTextPayloadMatcher<M> ParsedTextPayload(M matcher) {
-  return internal::ParsedTextPayloadMatcher<M>(std::move(matcher));
-}
-
-template <typename M>
-internal::BinaryPayloadMatcher<M> BinaryPayload(M matcher) {
-  return internal::BinaryPayloadMatcher<M>(std::move(matcher));
+internal::RawPayloadMatcher<M> Payload(M matcher) {
+  return internal::RawPayloadMatcher<M>(std::move(matcher));
 }
 
 inline internal::FailureMatcher IsParseError() {

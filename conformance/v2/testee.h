@@ -23,16 +23,19 @@ enum class TestStrictness {
 class TestResult {
  public:
   TestResult(absl::string_view test_name, const Descriptor* type,
+             conformance::ConformanceRequest request,
              conformance::ConformanceResponse response)
-      : test_name_(test_name), type_(type), response_(std::move(response)) {}
+      : test_name_(test_name), type_(type), request_(std::move(request)), response_(std::move(response)) {}
 
   absl::string_view name() const { return test_name_; }
   const Descriptor* type() const { return type_; }
+  const conformance::ConformanceRequest& request() const { return request_; }
   const conformance::ConformanceResponse& response() const { return response_; }
 
  private:
   std::string test_name_;
   const Descriptor* type_;
+  conformance::ConformanceRequest request_;
   conformance::ConformanceResponse response_;
 };
 
